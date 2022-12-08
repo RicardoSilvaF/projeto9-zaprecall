@@ -16,7 +16,7 @@ export default function DeckScreen (){
             </LogoContainer>
             {deckReact.map(
                 (card, i) => (
-                    <Flashcard key={card.question} index={i}/>
+                    <Flashcard key={card.question} index={i} card={card}/>
                 )
             )}
             <Footer totalQuestions={deckReact.length} questionsCounter={counter}/>
