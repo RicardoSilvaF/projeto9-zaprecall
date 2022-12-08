@@ -1,35 +1,42 @@
 import { useState } from "react"
 import styled from "styled-components"
-import play from "../assets/seta_play.png"
 import setaVirar from "../assets/seta_virar.png"
+import {VERDE, VERMELHO, AMARELO, CINZA} from "../constants/colors"
+import StatusIcon from "./StatusIcon"
 
-export default function Flashcard ({index, card}){
+export default function Flashcard ({index, card, aumentaContador, addAnswer}){
     const [started, setStarted] = useState(false)
     const [turned, setTurned] = useState(false)
     const [finalizada, setFinalizada] = useState(false)
+    const [status, setStatus] = useState("nao respondido")
+
 
     function showQuestion(){
         if(!finalizada){
             setStarted(true)
         }
-        
     }
 
     function showAnswer(){
         setTurned(true)
     }
 
-    function respondeuPergunta(){
+    function respondeuPergunta(questionStatus){
         setStarted(false)
         setFinalizada(true)
+        setStatus(questionStatus)
+        aumentaContador()
+        addAnswer(questionStatus)
     }   
+
+  
 
     return(
         <>
             {!started ? (
-                <PerguntaFechada>
-                <p>Pergunta {index+1}</p>
-                <img onClick={showQuestion} src={play} alt="icone play"/>
+                <PerguntaFechada status={status}>
+                    <p>Pergunta {index+1}</p>
+                    <StatusIcon status={status} showQuestion={showQuestion}/>
                 </PerguntaFechada>
             ) : (
                 <PerguntaAberta>
@@ -42,9 +49,9 @@ export default function Flashcard ({index, card}){
                         <>
                             {card.answer}
                             <ContainerBotoes>
-                                <button onClick={respondeuPergunta}>Não lembrei</button>
-                                <button onClick={respondeuPergunta}>Quase não lembrei</button>
-                                <button onClick={respondeuPergunta}>Zap!</button>
+                                <BotaoResposta background={VERMELHO} onClick={() => respondeuPergunta("errado")}>Não lembrei</BotaoResposta>
+                                <BotaoResposta background={AMARELO} onClick={() => respondeuPergunta("quase")}>Quase não lembrei</BotaoResposta>
+                                <BotaoResposta background={VERDE} onClick={() => respondeuPergunta("certo")}>Zap!</BotaoResposta>
                             </ContainerBotoes>
                         </>
                     )} 
@@ -57,24 +64,36 @@ export default function Flashcard ({index, card}){
 }
 
 const PerguntaFechada = styled.div`
-    width: 300px;
-    height: 35px;
-    background-color: #FFFFFF;
-    margin: 12px;
-    padding: 15px;
-    box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.15);
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    p {
-        font-family: 'Recursive';
-        font-style: normal;
-        font-weight: 700;
-        font-size: 16px;
-        line-height: 19px;
-        color: #333333;
+width: 300px;
+height: 35px;
+background-color: #FFFFFF;
+margin: 12px;
+padding: 15px;
+box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.15);
+border-radius: 5px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+p {
+  font-family: 'Recursive';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 19px;
+  text-decoration: ${props => props.status === "nao respondido" ? "none" : "line-through"};
+  color: ${props => {
+      switch(props.status){
+          case "certo":
+              return VERDE
+          case "errado":
+              return VERMELHO
+          case "quase":
+              return AMARELO
+          default:
+              return CINZA
       }
+  }}
+}
 `
 
 const PerguntaAberta = styled.div`
@@ -106,21 +125,24 @@ const ContainerBotoes = styled.div`
     display:flex;
     justify-content: space-between;
     margin-top: 10px;
-    button {
-        width: 90px;
-        font-family: 'Recursive';
-        font-style: normal;
-        font-weight: 400;
-        font-size: 12px;
-        line-height: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        color: #FFFFFF;
-        background: blue;
-        border-radius: 5px;
-        border: 1px solid blue;
-        padding:5px;
-    }
+`
+
+const BotaoResposta = styled.div`
+    width: 90px;
+    font-family: 'Recursive';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #FFFFFF;
+    background: ${props => props.background};
+    border-radius: 5px;
+    border: 1px solid ${props => props.background};
+    padding:5px;
+    margin-left:3.5px;
+    margin-right:3.5px;
 `

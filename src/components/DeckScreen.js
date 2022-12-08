@@ -7,6 +7,15 @@ import { useState } from "react";
 
 export default function DeckScreen (){
     const [counter, setCounter] = useState(0)
+    const [answers, setAnswers] = useState([])
+    
+    function aumentaContador(){
+        setCounter(counter+1)
+    }
+
+    function addAnswer(status) {
+        setAnswers([...answers, status])
+    }
 
     return(
         <ScreenContainer>
@@ -16,7 +25,13 @@ export default function DeckScreen (){
             </LogoContainer>
             {deckReact.map(
                 (card, i) => (
-                    <Flashcard key={card.question} index={i} card={card}/>
+                    <Flashcard
+                        key={card.question}
+                        index={i}
+                        card={card}
+                        aumentaContador={aumentaContador}
+                        addAnswer={addAnswer}
+                    />
                 )
             )}
             <Footer totalQuestions={deckReact.length} questionsCounter={counter}/>
